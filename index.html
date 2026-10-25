@@ -630,9 +630,29 @@ document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.pa
 function pay(){click();const nick=document.getElementById('mnick').value.trim();
 if(!nick||nick.length<3||nick.length>16||!/^[A-Za-z0-9_]+$/.test(nick)){toast('Укажи ник (3-16, латиница)');return}
 const gw=document.getElementById('gws').value;
+const payMethod=document.querySelector('input[name="p"]:checked')?.value||'sbp';
 if(gw==='demo'){ok();closeM();toast('ДЕМО: '+S.prod.n+' выдан '+nick);return}
-toast('Перенаправление...');
-fetch('http://localhost:3000/api/create-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname:nick,itemId:S.prod.id,price:S.prod.p,gateway:gw,promo:S.promo})}).then(r=>r.json()).then(d=>{if(d.paymentUrl)location.href=d.paymentUrl;else alert(`[${gw}] ${S.prod.p}₽ — ${nick}\nНастрой ключи в server.js`)}).catch(()=>alert(`[${gw}] ${S.prod.p}₽ — ${nick}\nНастрой ключи в server.js`))}
+
+toast('Перенаправление в платёжную систему...');
+
+// Генерация уникального ID платежа
+const payId = 'HW_' + Date.now();
+const desc = encodeURIComponent(`${S.prod.n} для ${nick} (${S.prod.id})`);
+const amount = S.prod.p;
+
+// Метод оплаты для AnyPay (sbp, card, ym, crypto)
+let anypayMethod = 'sbp';
+if(payMethod === 'card') anypayMethod = 'card';
+else if(payMethod === 'yoo') anypayMethod = 'ym';
+else if(payMethod === 'crypto') anypayMethod = 'crypto';
+
+// Прямой переход на защищённую кассу AnyPay
+const anypayUrl = `https://anypay.io/merchant?project_id=18631&pay_id=${payId}&amount=${amount}&currency=RUB&desc=${desc}&method=${anypayMethod}&email=`;
+
+setTimeout(()=>{
+  window.location.href = anypayUrl;
+}, 600);
+}
 
 // Toast
 let tt;function toast(m){const el=document.getElementById('toast');document.getElementById('tmsg').textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),3500)}
