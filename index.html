@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HENDEL WORLD — Minecraft 1.21.4</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;background:#060610}
+body{font-family:'Inter',sans-serif;color:#c9d1d9;background:#060610;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#060610}
+::-webkit-scrollbar-thumb{background:#1a1a2e;border-radius:3px}
+
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ─── GLOW ORBS ─── */
+.orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;animation:orbFloat 18s ease-in-out infinite alternate}
+.orb-1{width:650px;height:650px;top:-200px;left:-100px;background:radial-gradient(circle, rgba(201,168,76,.12) 0%, transparent 70%)}
+.orb-2{width:550px;height:550px;bottom:-150px;right:-100px;background:radial-gradient(circle, rgba(139,92,246,.09) 0%, transparent 70%);animation-duration:22s;animation-direction:alternate-reverse}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 30px) scale(1.08); }
+  100% { transform: translate(-30px, 50px) scale(0.95); }
+}
+
+.w{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:2}
+
+/* ─── NAV ─── */
+.nav{position:fixed;top:0;left:0;width:100%;height:56px;z-index:100;display:flex;align-items:center;background:rgba(6,6,16,.8);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04)}
+.nav .w{display:flex;align-items:center;justify-content:space-between;width:100%}
+.logo{font-size:16px;font-weight:800;letter-spacing:.5px;color:#fff}
+.logo span{color:#c9a84c}
+.nav-links{display:flex;gap:32px}
+.nav-links a{font-size:13px;font-weight:500;color:#64708a;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.ip-btn{display:flex;align-items:center;gap:10px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:7px 14px;cursor:pointer;transition:all .25s}
+.ip-btn:hover{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.1)}
+.ip-dot{width:6px;height:6px;background:#3fb950;border-radius:50%;box-shadow:0 0 6px #3fb950}
+.ip-text{font-size:12px;font-weight:700;color:#e6edf3;letter-spacing:.3px}
+
+/* ─── HERO ─── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative}
+.hero-inner{max-width:680px;position:relative;z-index:2}
+.hero-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:1.5px;color:#c9a84c;border:1px solid rgba(201,168,76,.2);padding:5px 14px;border-radius:20px;margin-bottom:28px}
+.hero h1{font-size:64px;font-weight:900;line-height:1.05;color:#fff;letter-spacing:-2px;margin-bottom:20px}
+.hero h1 .hl{background:linear-gradient(135deg,#d4a84c,#a07830);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:16px;color:#7a8599;line-height:1.7;max-width:500px;margin:0 auto 40px}
+.hero p strong{color:#c9d1d9}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+.btn-main{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700;transition:all .25s}
+.btn-gold{background:#c9a84c;color:#0a0a14;box-shadow:0 4px 20px rgba(201,168,76,.25)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.4)}
+.btn-ghost{background:rgba(255,255,255,.04);color:#c9d1d9;border:1px solid rgba(255,255,255,.1)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:40px;justify-content:center}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:28px;font-weight:800;color:#fff}
+.hero-stat .label{font-size:11px;color:#4a5568;font-weight:500;margin-top:2px}
+
+/* ─── SKIN FLOAT ─── */
+.skin-float{position:absolute;right:-340px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none}
+.skin-float img{width:180px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.8));animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ─── SECTION ─── */
+.sec{padding:100px 0}
+.sec-head{text-align:center;margin-bottom:56px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;color:#c9a84c;margin-bottom:10px}
+.sec-title{font-size:36px;font-weight:800;color:#e6edf3;letter-spacing:-1px}
+.sec-sub{font-size:14px;color:#4a5568;margin-top:8px}
+
+/* ─── TABS ─── */
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:48px}
+.tab{padding:9px 20px;border-radius:8px;font-size:12px;font-weight:600;color:#4a5568;background:transparent;border:1px solid rgba(255,255,255,.06);transition:all .2s}
+.tab:hover{color:#c9d1d9;border-color:rgba(255,255,255,.12)}
+.tab.on{color:#0a0a14;background:#c9a84c;border-color:#c9a84c}
+
+/* ─── PROMO ─── */
+.promo-bar{max-width:440px;margin:0 auto 40px;display:flex;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px 5px 5px 16px}
+.promo-bar input{flex:1;background:transparent;border:none;outline:none;color:#e6edf3;font-size:13px}
+.promo-bar input::placeholder{color:#3a4256}
+.btn-promo{background:#c9a84c;color:#0a0a14;font-size:11px;font-weight:700;padding:9px 16px;border-radius:7px;transition:all .2s}
+.btn-promo:hover{background:#d4b55c}
+#promoRes{text-align:center;margin-top:6px;font-size:12px;font-weight:600;min-height:16px}
+
+/* ─── GRID ─── */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+/* ─── CARD ─── */
+.card{background:rgba(12,12,24,.6);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:24px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .4s,background .3s;backdrop-filter:blur(12px)}
+.card:hover{transform:translateY(-8px) scale(1.01);border-color:rgba(255,255,255,.14);box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 25px rgba(var(--accent-rgb,201,168,76),.15);background:rgba(16,16,32,.75)}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent,transparent),transparent);opacity:0;transition:opacity .35s}
+.card:hover::after{opacity:1}
+
+.card-tier{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--accent,#4a5568);margin-bottom:16px;text-transform:uppercase}
+.card-name{font-size:22px;font-weight:800;color:#e6edf3;margin-bottom:4px;letter-spacing:-.5px}
+.card-rank{font-size:11px;font-weight:600;color:var(--accent,#4a5568);font-family:monospace;margin-bottom:16px}
+
+.card-price{display:flex;align-items:baseline;gap:8px;padding:16px 0;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);margin-bottom:16px}
+.p-old{font-size:13px;color:#2d3748;text-decoration:line-through}
+.p-now{font-size:28px;font-weight:800;color:#e6edf3}
+.p-cur{font-size:14px;font-weight:600;color:#4a5568;margin-left:2px}
+.p-disc{font-size:10px;font-weight:700;color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);padding:2px 6px;border-radius:4px;align-self:center}
+
+.feats{list-style:none;flex:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.feats li{font-size:12.5px;color:#4a5568;line-height:1.4;padding-left:18px;position:relative}
+.feats li::before{content:'›';position:absolute;left:0;color:var(--accent,#4a5568);font-weight:700;font-size:14px}
+.feats li strong{color:#8b949e}
+.feats li code{font-size:11px;background:rgba(255,255,255,.05);padding:1px 5px;border-radius:3px;color:#c9a84c}
+
+.btn-card{width:100%;padding:12px;border-radius:9px;font-size:13px;font-weight:700;transition:all .25s;letter-spacing:.2px}
+.btn-c-default{background:rgba(255,255,255,.04);color:#8b949e;border:1px solid rgba(255,255,255,.08)}
+.btn-c-default:hover{background:rgba(255,255,255,.08);color:#e6edf3;transform:translateY(-1px)}
+.btn-c-gold{background:#c9a84c;color:#0a0a14}
+.btn-c-gold:hover{background:#d4b55c;transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.3)}
+.btn-c-accent{background:var(--accent,#4a5568);color:#fff}
+.btn-c-accent:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(var(--accent-rgb,74,85,104),.3)}
+
+/* Card variants */
+.card[data-v="green"]{--accent:#3fb950;--accent-rgb:63,185,80}
+.card[data-v="yellow"]{--accent:#d29922;--accent-rgb:210,153,34}
+.card[data-v="purple"]{--accent:#a371f7;--accent-rgb:163,113,247}
+.card[data-v="gold"]{--accent:#c9a84c;--accent-rgb:201,168,76;border-color:rgba(201,168,76,.12)}
+.card[data-v="cyan"]{--accent:#58a6ff;--accent-rgb:88,166,255;border-color:rgba(88,166,255,.12)}
+.card[data-v="rainbow"]{border-image:linear-gradient(135deg,#d29922,#f778ba,#a371f7) 1;box-shadow:0 0 20px rgba(247,120,186,.08)}
+.card[data-v="red"]{--accent:#f87171;--accent-rgb:248,113,113;border-color:rgba(248,113,113,.12)}
+
+/* ─── FEATURES GRID ─── */
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.feat-card{background:rgba(12,12,24,.5);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:28px 22px;transition:all .3s}
+.feat-card:hover{border-color:rgba(201,168,76,.15);transform:translateY(-4px)}
+.feat-card h3{font-size:14px;font-weight:700;color:#e6edf3;margin-bottom:8px}
+.feat-card p{font-size:12px;color:#4a5568;line-height:1.6}
+.feat-card code{font-size:11px;background:rgba(255,255,255,.05);padding:1px 4px;border-radius:3px;color:#c9a84c}
+.feat-num{font-size:24px;font-weight:800;color:rgba(201,168,76,.15);margin-bottom:12px;font-family:monospace}
+
+/* ─── RULES ─── */
+.rules-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.rule{background:rgba(12,12,24,.4);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:20px}
+.rule-n{font-size:11px;font-weight:700;color:#c9a84c;font-family:monospace;margin-bottom:8px}
+.rule h4{font-size:13px;font-weight:700;color:#c9d1d9;margin-bottom:4px}
+.rule p{font-size:12px;color:#4a5568;line-height:1.5}
+
+/* ─── FOOTER ─── */
+.footer{border-top:1px solid rgba(255,255,255,.04);padding:48px 0 0;margin-top:40px}
+.f-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.f-name{font-size:16px;font-weight:800;color:#e6edf3;margin-bottom:10px}
+.f-name span{color:#c9a84c}
+.f-desc{font-size:12px;color:#4a5568;line-height:1.6;max-width:340px}
+.f-col h4{font-size:13px;font-weight:700;color:#8b949e;margin-bottom:14px}
+.f-col a{display:block;font-size:12px;color:#4a5568;margin-bottom:8px;transition:color .2s}
+.f-col a:hover{color:#c9a84c}
+.f-bottom{border-top:1px solid rgba(255,255,255,.03);padding:16px 0;text-align:center;font-size:10px;color:#2d3748}
+
+/* ─── MODAL ─── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-bg.open{opacity:1;pointer-events:auto}
+.modal{background:#0c0c18;border:1px solid rgba(201,168,76,.2);border-radius:16px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;padding:28px;position:relative;transform:scale(.96);transition:transform .25s}
+.modal-bg.open .modal{transform:scale(1)}
+.modal-x{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.05);border:none;color:#4a5568;font-size:18px;width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-x:hover{background:rgba(248,113,113,.1);color:#f87171}
+.modal h3{font-size:18px;font-weight:800;color:#e6edf3;margin-bottom:20px}
+.m-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.m-row-name{font-size:14px;font-weight:700;color:#c9d1d9}
+.m-row-label{font-size:10px;color:#2d3748;margin-bottom:2px}
+.m-row-price{font-size:20px;font-weight:800;color:#c9a84c}
+.m-nick{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:16px}
+.m-av{width:48px;height:48px;border-radius:8px;background:#0a0a14;border:1px solid rgba(201,168,76,.2);overflow:hidden;flex-shrink:0}
+.m-av img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.m-nick-wr{flex:1}
+.m-nick-wr label{display:block;font-size:11px;font-weight:600;color:#4a5568;margin-bottom:4px}
+.m-nick-wr input{width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:9px 10px;color:#e6edf3;font-size:13px;outline:none;transition:border-color .2s}
+.m-nick-wr input:focus{border-color:rgba(201,168,76,.4)}
+.m-nick-wr span{font-size:9px;color:#2d3748;margin-top:3px;display:block}
+.m-label{font-size:10px;font-weight:600;color:#2d3748;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.pay-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.pay-o{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s;position:relative}
+.pay-o input{position:absolute;opacity:0}
+.pay-o:hover{border-color:rgba(255,255,255,.12)}
+.pay-o.sel{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.04)}
+.pay-o b{font-size:12px;color:#c9d1d9;display:block}
+.pay-o small{font-size:9px;color:#2d3748}
+.gw{margin-bottom:18px}
+.gw label{display:block;font-size:10px;font-weight:600;color:#2d3748;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.gw select{width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:10px;color:#c9d1d9;font-size:12px;font-family:inherit;outline:none}
+.btn-pay{width:100%;padding:13px;border-radius:9px;background:#c9a84c;color:#0a0a14;font-size:14px;font-weight:800;transition:all .2s}
+.btn-pay:hover{background:#d4b55c;box-shadow:0 6px 20px rgba(201,168,76,.3)}
+.m-sec{text-align:center;margin-top:10px;font-size:10px;color:#2d3748}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:24px;right:24px;background:#0c0c18;border:1px solid rgba(201,168,76,.3);padding:12px 18px;border-radius:10px;color:#c9d1d9;font-size:12px;font-weight:600;z-index:300;transform:translateY(60px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ─── REVEAL & ANIMATIONS ─── */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv.vis{opacity:1;transform:none}
+
+/* Stagger animation delay on cards */
+.grid .card:nth-child(1){transition-delay:0.05s}
+.grid .card:nth-child(2){transition-delay:0.1s}
+.grid .card:nth-child(3){transition-delay:0.15s}
+.grid .card:nth-child(4){transition-delay:0.2s}
+.grid .card:nth-child(5){transition-delay:0.25s}
+.grid .card:nth-child(6){transition-delay:0.3s}
+
+/* Hero entrance keyframes */
+.hero-inner{animation:heroIn 1s cubic-bezier(.16,1,.3,1) both}
+@keyframes heroIn{
+  from{opacity:0;transform:translateY(25px)}
+  to{opacity:1;transform:none}
+}
+
+/* Subtle gradient wave for Infinity */
+@keyframes rainbowFlow{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.card[data-v="rainbow"] .btn-card{
+  background-size:200% 200%!important;
+  animation:rainbowFlow 4s ease infinite;
+}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}.feat-grid{grid-template-columns:repeat(2,1fr)}.f-grid{grid-template-columns:1fr 1fr}.skin-float{display:none}}
+@media(max-width:640px){.nav-links{display:none}.hero h1{font-size:40px}.grid{grid-template-columns:1fr}.feat-grid{grid-template-columns:1fr}.rules-row{grid-template-columns:1fr}.pay-g{grid-template-columns:1fr}.f-grid{grid-template-columns:1fr}.hero-cta{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<header class="nav">
+<div class="w">
+  <div class="logo">HENDEL <span>WORLD</span></div>
+  <nav class="nav-links">
+    <a href="#shop">Магазин</a>
+    <a href="#about">О сервере</a>
+    <a href="#rules">Правила</a>
+  </nav>
+  <div class="ip-btn" onclick="copyIP()">
+    <span class="ip-dot"></span>
+    <span class="ip-text" id="sip">play.hendelworld.net</span>
+  </div>
+</div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-inner">
+  <div class="hero-badge">СЕЗОН II · ГРИФЕРСКИЙ СЕРВЕР · 1.21.4</div>
+  <h1>Место, где<br>правит <span class="hl">хаос</span></h1>
+  <p>ТНТ-рейды, клановые войны, кастомные артефакты и нейросетевой античит <strong>React AI</strong> — без единого ложного бана.</p>
+  <div class="hero-cta">
+    <a href="#shop" class="btn-main btn-gold">Перейти в магазин</a>
+    <button class="btn-main btn-ghost" onclick="copyIP()">Скопировать IP</button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">284</div><div class="label">Онлайн сейчас</div></div>
+    <div class="hero-stat"><div class="num">500</div><div class="label">Макс. слотов</div></div>
+    <div class="hero-stat"><div class="num">12K+</div><div class="label">Игроков всего</div></div>
+  </div>
+</div>
+<div class="skin-float"><img src="https://mc-heads.net/body/Saanimaing/right" alt=""></div>
+</section>
+
+<!-- SHOP -->
+<section class="sec" id="shop">
+<div class="w">
+  <div class="sec-head">
+    <div class="sec-label">МАГАЗИН</div>
+    <div class="sec-title">Привилегии и донат</div>
+    <div class="sec-sub">Моментальная выдача после оплаты</div>
+  </div>
+
+  <div class="promo-bar">
+    <input type="text" id="pi" placeholder="Промокод (HENDEL, GRIEF2026)">
+    <button class="btn-promo" onclick="applyPromo()">OK</button>
+  </div>
+  <div id="promoRes"></div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="sw('ranks',this)">Привилегии</button>
+    <button class="tab" onclick="sw('cases',this)">Кейсы</button>
+    <button class="tab" onclick="sw('currency',this)">Валюта</button>
+  </div>
+
+  <div class="grid" id="g">
+
+  <!-- DREAM -->
+  <div class="card rv" data-cat="ranks" data-v="green">
+    <div class="card-tier">Старт</div>
+    <div class="card-name">Dream</div>
+    <div class="card-rank">[Dream]</div>
+    <div class="card-price">
+      <span class="p-old">35 ₽</span>
+      <span class="p-now" data-base="20">20</span><span class="p-cur">₽</span>
+      <span class="p-disc">-43%</span>
+    </div>
+    <ul class="feats">
+      <li><strong>2 точки дома</strong> <code>/sethome</code></li>
+      <li><strong>3 региона</strong> — до 60 000 блоков</li>
+      <li>Набор <code>/kit dream</code></li>
+      <li>Зелёный префикс в чате</li>
+      <li>Приоритет входа при полном сервере</li>
+    </ul>
+    <button class="btn-card btn-c-default" onclick="openM('Dream',20,'rank_dream')">Купить — 20 ₽</button>
+  </div>
+
+  <!-- RICH -->
+  <div class="card rv" data-cat="ranks" data-v="yellow">
+    <div class="card-tier">Выгодно</div>
+    <div class="card-name">Rich</div>
+    <div class="card-rank">[Rich]</div>
+    <div class="card-price">
+      <span class="p-old">149 ₽</span>
+      <span class="p-now" data-base="99">99</span><span class="p-cur">₽</span>
+      <span class="p-disc">-33%</span>
+    </div>
+    <ul class="feats">
+      <li>Все возможности Dream</li>
+      <li><strong>3 дома · 4 региона</strong> (до 100k)</li>
+      <li>Виртуальный сундук <code>/ec</code></li>
+      <li><strong>Цветной чат</strong></li>
+      <li>Набор <code>/kit rich</code></li>
+    </ul>
+    <button class="btn-card btn-c-default" onclick="openM('Rich',99,'rank_rich')">Купить — 99 ₽</button>
+  </div>
+
+  <!-- DRAGON -->
+  <div class="card rv" data-cat="ranks" data-v="purple">
+    <div class="card-tier">Популярное</div>
+    <div class="card-name">Dragon</div>
+    <div class="card-rank">[Dragon]</div>
+    <div class="card-price">
+      <span class="p-old">400 ₽</span>
+      <span class="p-now" data-base="260">260</span><span class="p-cur">₽</span>
+      <span class="p-disc">-35%</span>
+    </div>
+    <ul class="feats">
+      <li>Все возможности Rich</li>
+      <li><strong>5 домов · 5 регионов</strong> (до 150k)</li>
+      <li>Верстак <code>/craft</code> · Голод <code>/feed</code></li>
+      <li>Блок на голову <code>/hat</code></li>
+      <li>Набор <code>/kit dragon</code></li>
+    </ul>
+    <button class="btn-card btn-c-accent" onclick="openM('Dragon',260,'rank_dragon')">Купить — 260 ₽</button>
+  </div>
+
+  <!-- HENDEL -->
+  <div class="card rv" data-cat="ranks" data-v="gold">
+    <div class="card-tier">Легенда</div>
+    <div class="card-name">Hendel</div>
+    <div class="card-rank">[HENDEL]</div>
+    <div class="card-price">
+      <span class="p-old">750 ₽</span>
+      <span class="p-now" data-base="500">500</span><span class="p-cur">₽</span>
+      <span class="p-disc">-33%</span>
+    </div>
+    <ul class="feats">
+      <li>Все функции ниже</li>
+      <li><strong>10 домов · 7 регионов</strong> (до 250k)</li>
+      <li>Лечение <code>/heal</code> · Починка <code>/repair</code></li>
+      <li>Кит: Алмазка + Тотем + Notch-яблоко</li>
+    </ul>
+    <button class="btn-card btn-c-gold" onclick="openM('Hendel',500,'rank_hendel')">Купить — 500 ₽</button>
+  </div>
+
+  <!-- ASTRA -->
+  <div class="card rv" data-cat="ranks" data-v="cyan">
+    <div class="card-tier">Космос</div>
+    <div class="card-name">Astra</div>
+    <div class="card-rank">[★ASTRA★]</div>
+    <div class="card-price">
+      <span class="p-old">1499 ₽</span>
+      <span class="p-now" data-base="1000">1000</span><span class="p-cur">₽</span>
+      <span class="p-disc">-33%</span>
+    </div>
+    <ul class="feats">
+      <li>Все из Hendel</li>
+      <li><strong>25 домов · 10 приватов</strong> (до 400k)</li>
+      <li>Просмотр инвентарей <code>/invsee</code></li>
+      <li>Стиль ника <code>/font</code></li>
+      <li>Телепорт на ивент <code>/rtp event</code></li>
+    </ul>
+    <button class="btn-card btn-c-accent" onclick="openM('Astra',1000,'rank_astra')">Купить — 1000 ₽</button>
+  </div>
+
+  <!-- INFINITY -->
+  <div class="card rv" data-cat="ranks" data-v="rainbow">
+    <div class="card-tier" style="background:linear-gradient(90deg,#d29922,#f778ba,#a371f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Максимальный статус</div>
+    <div class="card-name" style="background:linear-gradient(90deg,#d29922,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Infinity</div>
+    <div class="card-rank" style="color:#f778ba">[∞INFINITY∞]</div>
+    <div class="card-price">
+      <span class="p-old">2999 ₽</span>
+      <span class="p-now" data-base="2000" style="background:linear-gradient(90deg,#d29922,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent">2000</span><span class="p-cur">₽</span>
+      <span class="p-disc">-33%</span>
+    </div>
+    <ul class="feats">
+      <li><strong>Все возможности навсегда</strong></li>
+      <li><strong>50 домов · 15 приватов</strong> (750k)</li>
+      <li>Радужный ник <code>/font rainbow</code></li>
+      <li>Свой цвет чата <code>/textcolor</code></li>
+      <li>Кит: Алмазка З4 + 4 Тотема + Лук ∞</li>
+    </ul>
+    <button class="btn-card" style="background:linear-gradient(135deg,#d29922,#f778ba,#a371f7);color:#fff;font-weight:800" onclick="openM('Infinity',2000,'rank_infinity')">Стать Infinity — 2000 ₽</button>
+  </div>
+
+  <!-- CASE DONATE -->
+  <div class="card rv" data-cat="cases" data-v="gold" style="display:none">
+    <div class="card-tier">Рулетка</div>
+    <div class="card-name">Донат-кейс</div>
+    <div class="card-rank">Шанс на Infinity</div>
+    <div class="card-price"><span class="p-now" data-base="49">49</span><span class="p-cur">₽</span></div>
+    <ul class="feats">
+      <li>Рулетка рандомного ранга в игре</li>
+      <li>Dream 40% · Rich 28% · Dragon 18%</li>
+      <li>Hendel 8% · Astra 5%</li>
+      <li><strong>Infinity — 1% джекпот</strong></li>
+    </ul>
+    <button class="btn-card btn-c-gold" onclick="openM('Донат-кейс',49,'case_donate')">Открыть — 49 ₽</button>
+  </div>
+
+  <!-- CASE WEAPON -->
+  <div class="card rv" data-cat="cases" data-v="purple" style="display:none">
+    <div class="card-tier">Артефакты</div>
+    <div class="card-name">Оружейный кейс</div>
+    <div class="card-rank">Топ дропы</div>
+    <div class="card-price"><span class="p-now" data-base="79">79</span><span class="p-cur">₽</span></div>
+    <ul class="feats">
+      <li>50k–150k монет — 40%</li>
+      <li>Алмаз. PvP-сет З4 — 30%</li>
+      <li>Кирка Убра (Эфф VII) — 7%</li>
+      <li><strong>Гнев Гиганта (+12 урон) — 1%</strong></li>
+    </ul>
+    <button class="btn-card btn-c-accent" onclick="openM('Оружейный кейс',79,'case_weapon')">Открыть — 79 ₽</button>
+  </div>
+
+  <!-- COINS -->
+  <div class="card rv" data-cat="currency" data-v="yellow" style="display:none">
+    <div class="card-tier">Монеты</div>
+    <div class="card-name">500 000</div>
+    <div class="card-rank">Быстрый старт</div>
+    <div class="card-price"><span class="p-now" data-base="99">99</span><span class="p-cur">₽</span></div>
+    <ul class="feats">
+      <li>Зачисление за 1 секунду</li>
+      <li>Хватит на клан и снаряжение</li>
+      <li>Аукцион <code>/ah</code></li>
+    </ul>
+    <button class="btn-card btn-c-default" onclick="openM('500 000 монет',99,'coins_500k')">Купить — 99 ₽</button>
+  </div>
+
+  <!-- COINS BIG -->
+  <div class="card rv" data-cat="currency" data-v="gold" style="display:none">
+    <div class="card-tier">Мега-пакет</div>
+    <div class="card-name">2 500 000</div>
+    <div class="card-rank">Олигарх</div>
+    <div class="card-price"><span class="p-now" data-base="299">299</span><span class="p-cur">₽</span></div>
+    <ul class="feats">
+      <li>Самый богатый на сервере</li>
+      <li>Скупай любые лоты аукциона</li>
+      <li>Прокачай казну клана</li>
+    </ul>
+    <button class="btn-card btn-c-gold" onclick="openM('2 500 000 монет',299,'coins_2500k')">Купить — 299 ₽</button>
+  </div>
+
+
+
+  </div>
+</div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec" id="about">
+<div class="w">
+  <div class="sec-head">
+    <div class="sec-label">О СЕРВЕРЕ</div>
+    <div class="sec-title">Почему Hendel World</div>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card rv"><div class="feat-num">01</div><h3>ТНТ-рейды</h3><p>Строй пушки, взрывай базы врагов. Гриферство полностью разрешено.</p></div>
+    <div class="feat-card rv"><div class="feat-num">02</div><h3>Приваты</h3><p>Защити территорию <code>//wand</code> + <code>/rg claim</code>. Зона растёт с рангом.</p></div>
+    <div class="feat-card rv"><div class="feat-num">03</div><h3>Кланы</h3><p>Создай клан, копи казну, воюй за топ. Клан-база <code>/clan sethome</code>.</p></div>
+    <div class="feat-card rv"><div class="feat-num">04</div><h3>React AI</h3><p>Ловит KillAura и SpeedHack. Автокликер разрешён. Ноль ложных банов.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- RULES -->
+<section class="sec" id="rules">
+<div class="w">
+  <div class="sec-head">
+    <div class="sec-label">КОДЕКС</div>
+    <div class="sec-title">Правила проекта</div>
+  </div>
+  <div class="rules-row">
+    <div class="rule rv"><div class="rule-n">01</div><h4>Читы</h4><p>SpeedHack, Fly, KillAura, Scaffold — запрещены. Автокликер разрешён.</p></div>
+    <div class="rule rv"><div class="rule-n">02</div><h4>Выход из боя</h4><p>CombatLog — мгновенная смерть, лут падает на землю.</p></div>
+    <div class="rule rv"><div class="rule-n">03</div><h4>Чат</h4><p>Запрещена реклама, спам и оскорбления родных.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+<div class="w f-grid">
+  <div><div class="f-name">HENDEL <span>WORLD</span></div><p class="f-desc">Гриферский проект с честной игрой и нейросетевым античитом.</p></div>
+  <div class="f-col"><h4>Навигация</h4><a href="#shop">Магазин</a><a href="#about">О сервере</a><a href="#rules">Правила</a></div>
+  <div class="f-col"><h4>Поддержка</h4><a href="#">Telegram</a><a href="#">Discord</a></div>
+</div>
+<div class="f-bottom"><div class="w">© 2026 HENDEL WORLD</div></div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-bg" id="mbg">
+<div class="modal">
+  <button class="modal-x" onclick="closeM()">×</button>
+  <h3>Оформление заказа</h3>
+  <div class="m-row">
+    <div><div class="m-row-label">Товар</div><div class="m-row-name" id="mn">—</div></div>
+    <div class="m-row-price" id="mp">—</div>
+  </div>
+  <div class="m-nick">
+    <div class="m-av"><img src="https://mc-heads.net/avatar/Steve" id="mav" alt=""></div>
+    <div class="m-nick-wr">
+      <label>Ник в игре</label>
+      <input type="text" id="mnick" placeholder="Введи точный ник..." oninput="uav(this.value)">
+      <span>Скин загрузится автоматически</span>
+    </div>
+  </div>
+  <div class="m-label">Способ оплаты</div>
+  <div class="pay-g">
+    <label class="pay-o sel"><input type="radio" name="p" value="sbp" checked><div><b>СБП</b><small>0% · мгновенно</small></div></label>
+    <label class="pay-o"><input type="radio" name="p" value="card"><div><b>Карта РФ</b><small>МИР / Visa</small></div></label>
+    <label class="pay-o"><input type="radio" name="p" value="yoo"><div><b>ЮMoney</b><small>Электронные</small></div></label>
+    <label class="pay-o"><input type="radio" name="p" value="crypto"><div><b>Крипто</b><small>USDT / TON</small></div></label>
+  </div>
+  <div class="gw">
+    <label>Агрегатор</label>
+    <select id="gws">
+      <option value="anypay">AnyPay — СБП, Карты, все методы</option>
+      <option value="payok">PayOK — Карты РФ/СНГ</option>
+      <option value="freekassa">FreeKassa — Крипта, Кошельки</option>
+      <option value="demo">Демо-режим (тест)</option>
+    </select>
+  </div>
+  <button class="btn-pay" onclick="pay()">Перейти к оплате — <span id="mbp">—</span></button>
+  <div class="m-sec">Защищённое SSL-соединение · выдача за 3 секунды</div>
+</div>
+</div>
+
+<div class="toast" id="toast"><span id="tmsg"></span></div>
+
+<script>
+// State
+const S={snd:true,disc:0,promo:'',prod:{n:'',p:0,id:''},ctx:null};
+
+// Audio
+function iA(){if(S.ctx){if(S.ctx.state==='suspended')S.ctx.resume();return}const A=window.AudioContext||window.webkitAudioContext;if(A)S.ctx=new A()}
+function tn(f,t,d,v=.1){if(!S.snd||!S.ctx)return;try{const o=S.ctx.createOscillator(),g=S.ctx.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,S.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,S.ctx.currentTime+d);o.connect(g);g.connect(S.ctx.destination);o.start();o.stop(S.ctx.currentTime+d)}catch(_){}}
+function click(){tn(600,'sine',.07,.12);setTimeout(()=>tn(880,'triangle',.05,.08),25)}
+function ok(){[440,659,880].forEach((f,i)=>setTimeout(()=>tn(f,'triangle',.2,.15),i*80))}
+
+// Particles (connected dots like HolyWorld)
+(function(){
+const c=document.getElementById('c');if(!c)return;const x=c.getContext('2d');
+let W,H;const pts=[];const N=40;
+function sz(){W=c.width=innerWidth;H=c.height=innerHeight}
+sz();addEventListener('resize',sz);
+for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5});
+(function loop(){
+  x.clearRect(0,0,W,H);
+  for(let i=0;i<N;i++){
+    const a=pts[i];
+    a.x+=a.vx;a.y+=a.vy;
+    if(a.x<0||a.x>W)a.vx*=-1;
+    if(a.y<0||a.y>H)a.vy*=-1;
+    // Draw dot
+    x.beginPath();x.arc(a.x,a.y,a.r,0,Math.PI*2);
+    x.fillStyle='rgba(201,168,76,.25)';x.fill();
+    // Connect nearby
+    for(let j=i+1;j<N;j++){
+      const b=pts[j];const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<150){
+        x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);
+        x.strokeStyle=`rgba(201,168,76,${.08*(1-d/150)})`;x.lineWidth=.5;x.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(loop);
+})();
+})();
+
+// Scroll reveal
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target)}})},{threshold:.1});
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.rv').forEach(e=>obs.observe(e))});
+
+// Copy IP
+function copyIP(){click();const ip=document.getElementById('sip').textContent;navigator.clipboard.writeText(ip).then(()=>toast('IP скопирован — '+ip)).catch(()=>toast(ip))}
+
+// Tabs
+function sw(cat,btn){click();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('#g .card').forEach(c=>{c.style.display=c.dataset.cat===cat?'flex':'none'})}
+
+// Promo
+const CODES={HENDEL:.2,GRIEF2026:.15,START:.1,YOUTUBE:.15};
+function applyPromo(){click();const code=(document.getElementById('pi').value||'').trim().toUpperCase();const el=document.getElementById('promoRes');
+if(!code){el.innerHTML='<span style="color:#f87171">Введите промокод</span>';return}
+if(CODES[code]){S.disc=CODES[code];S.promo=code;const p=Math.round(S.disc*100);el.innerHTML=`<span style="color:#3fb950">Скидка −${p}% применена</span>`;ok();recalc();toast(`−${p}% на весь магазин`)}
+else{el.innerHTML='<span style="color:#f87171">Неверный промокод</span>'}}
+function recalc(){document.querySelectorAll('.p-now[data-base]').forEach(e=>{const b=+e.dataset.base;if(!b)return;e.textContent=Math.max(1,Math.round(b*(1-S.disc)))})}
+
+// Modal
+function openM(n,base,id){click();iA();const p=Math.max(1,Math.round(base*(1-S.disc)));S.prod={n,p,id};
+document.getElementById('mn').textContent=n;document.getElementById('mp').textContent=p+' ₽';document.getElementById('mbp').textContent=p+' ₽';
+document.getElementById('mbg').classList.add('open');setTimeout(()=>document.getElementById('mnick').focus(),200)}
+function closeM(){document.getElementById('mbg').classList.remove('open')}
+let avt;function uav(v){clearTimeout(avt);avt=setTimeout(()=>{const n=v.trim();document.getElementById('mav').src=n.length>=3?`https://mc-heads.net/avatar/${n}`:'https://mc-heads.net/avatar/Steve'},300)}
+addEventListener('click',e=>{if(e.target.id==='mbg')closeM()});addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+// Pay card selection
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.pay-o').forEach(o=>{o.addEventListener('click',()=>{document.querySelectorAll('.pay-o').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');const r=o.querySelector('input');if(r)r.checked=true})})});
+function pay(){click();const nick=document.getElementById('mnick').value.trim();
+if(!nick||nick.length<3||nick.length>16||!/^[A-Za-z0-9_]+$/.test(nick)){toast('Укажи ник (3-16, латиница)');return}
+const gw=document.getElementById('gws').value;
+if(gw==='demo'){ok();closeM();toast('ДЕМО: '+S.prod.n+' выдан '+nick);return}
+toast('Перенаправление...');
+fetch('http://localhost:3000/api/create-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname:nick,itemId:S.prod.id,price:S.prod.p,gateway:gw,promo:S.promo})}).then(r=>r.json()).then(d=>{if(d.paymentUrl)location.href=d.paymentUrl;else alert(`[${gw}] ${S.prod.p}₽ — ${nick}\nНастрой ключи в server.js`)}).catch(()=>alert(`[${gw}] ${S.prod.p}₽ — ${nick}\nНастрой ключи в server.js`))}
+
+// Toast
+let tt;function toast(m){const el=document.getElementById('toast');document.getElementById('tmsg').textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),3500)}
+
+// Init audio on first click
+document.addEventListener('click',iA,{once:true});
+</script>
+</body>
+</html>
