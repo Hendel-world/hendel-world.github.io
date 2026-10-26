@@ -218,46 +218,67 @@ let antiAfkInterval = null;
 function startAntiAfk() {
     if (antiAfkInterval) clearInterval(antiAfkInterval);
     
-    // Активное живое движение каждые 2.5 секунды
+    let stepCount = 0;
     antiAfkInterval = setInterval(() => {
         if (!bot || !bot.entity) return;
         try {
-            // 1. Если рядом есть игрок (в радиусе 15 блоков) — поворачиваться к нему!
+            stepCount++;
             const target = bot.nearestEntity(e => e.type === 'player' && e.username !== bot.username);
+            
             if (target && target.position) {
+                // 1. Смотрим на игрока прямо в лицо
                 bot.lookAt(target.position.offset(0, 1.6, 0), true);
                 
-                // Приседание (приветствие шифтом как реальный игрок)
-                if (Math.random() < 0.45) {
-                    bot.setControlState('sneak', true);
-                    setTimeout(() => { if (bot) bot.setControlState('sneak', false); }, 400);
+                const dist = bot.entity.position.distanceTo(target.position);
+                
+                if (dist > 3.0 && dist < 22.0) {
+                    // Игрок дальше 3 блоков — бот бежит за ним!
+                    bot.setControlState('forward', true);
+                    bot.setControlState('back', false);
+                    bot.setControlState('sprint', true);
+                    
+                    // Прыгать если упёрся в блок или на бегу
+                    if (bot.entity.isCollidedHorizontally || Math.random() < 0.25) {
+                        bot.setControlState('jump', true);
+                        setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 300);
+                    }
+                } else {
+                    // Подошёл в упор — останавливаемся и общаемся жестами
+                    bot.setControlState('forward', false);
+                    bot.setControlState('sprint', false);
+                    
+                    // Машет рукой
+                    if (stepCount % 3 === 0) {
+                        bot.swingArm('right');
+                    }
+                    // Прыгает от радости
+                    if (stepCount % 5 === 0) {
+                        bot.setControlState('jump', true);
+                        setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 350);
+                    }
+                    // Приседает (шифтует)
+                    if (stepCount % 4 === 0) {
+                        bot.setControlState('sneak', true);
+                        setTimeout(() => { if (bot) bot.setControlState('sneak', false); }, 300);
+                    }
                 }
             } else {
-                // Если рядом никого нет — осматриваться вокруг
-                const yaw = (Math.random() * Math.PI * 2) - Math.PI;
-                const pitch = (Math.random() * 0.6) - 0.3;
-                bot.look(yaw, pitch, true);
-            }
-
-            // 2. Реальные шаги (случайное направление: вперед, назад, вбок)
-            const moves = ['forward', 'back', 'left', 'right'];
-            const move = moves[Math.floor(Math.random() * moves.length)];
-            bot.setControlState(move, true);
-            setTimeout(() => {
-                if (!bot) return;
-                bot.setControlState(move, false);
-            }, 600 + Math.floor(Math.random() * 600));
-
-            // 3. Прыжки и взмахи рукой
-            if (Math.random() < 0.35) {
-                bot.setControlState('jump', true);
-                setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 350);
-            }
-            if (Math.random() < 0.5) {
-                bot.swingArm('right');
+                // Если игроков рядом нет — осматриваемся и патрулируем
+                bot.setControlState('sprint', false);
+                if (stepCount % 6 === 0) {
+                    const yaw = (Math.random() * Math.PI * 2) - Math.PI;
+                    bot.look(yaw, 0, true);
+                    bot.setControlState('forward', true);
+                    setTimeout(() => { if (bot) bot.setControlState('forward', false); }, 1000);
+                }
+                if (stepCount % 8 === 0) {
+                    bot.setControlState('jump', true);
+                    setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 350);
+                    bot.swingArm('right');
+                }
             }
         } catch (e) {}
-    }, 2500);
+    }, 500);
 }
 
 function scheduleReconnect() {
