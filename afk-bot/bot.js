@@ -204,12 +204,25 @@ function startAntiAfk() {
             const pitch = (Math.random() * Math.PI / 2) - (Math.PI / 4);
             bot.look(yaw, pitch, true);
             bot.swingArm('right');
+
+            // Шаг вперед и назад чтобы сбрасывать vanilla/paper AFK-таймер
+            bot.setControlState('forward', true);
+            setTimeout(() => {
+                if (!bot) return;
+                bot.setControlState('forward', false);
+                bot.setControlState('back', true);
+                setTimeout(() => {
+                    if (!bot) return;
+                    bot.setControlState('back', false);
+                }, 300);
+            }, 300);
+
             if (Math.random() < 0.25) {
                 bot.setControlState('jump', true);
                 setTimeout(() => bot.setControlState('jump', false), 350);
             }
         } catch (e) {}
-    }, 25000);
+    }, 20000);
 }
 
 function scheduleReconnect() {
@@ -226,6 +239,14 @@ function scheduleReconnect() {
 
 // Запуск бота Minecraft
 createBot();
+
+// Self-ping каждые 5 минут, чтобы Render Free никогда не засыпал
+setInterval(() => {
+    try {
+        const https = require('https');
+        https.get('https://hendel-afk-bot.onrender.com/', () => {}).on('error', () => {});
+    } catch (e) {}
+}, 5 * 60 * 1000);
 
 // Запуск Telegram бота техподдержки 24/7
 try {
