@@ -136,5 +136,13 @@ function scheduleReconnect() {
     }, 20000);
 }
 
-// Запуск
+// Запуск Minecraft AFK бота
 createBot();
+
+// Запуск Telegram бота поддержки 24/7 с почтовым ящиком
+try {
+    const { startBotPolling } = require('./tg-bot');
+    startBotPolling();
+} catch (err) {
+    console.error('[TG Bot] Ошибка инициализации:', err.message);
+}
