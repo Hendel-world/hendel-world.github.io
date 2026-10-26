@@ -513,12 +513,51 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 <!-- FOOTER -->
 <footer class="footer">
 <div class="w f-grid">
-  <div><div class="f-name">HENDEL <span>WORLD</span></div><p class="f-desc">Гриферский проект с честной игрой и нейросетевым античитом.</p></div>
-  <div class="f-col"><h4>Навигация</h4><a href="#shop">Магазин</a><a href="#about">О сервере</a><a href="#rules">Правила</a></div>
-  <div class="f-col"><h4>Поддержка</h4><a href="#">Telegram</a><a href="#">Discord</a></div>
+  <div>
+    <div class="f-name">HENDEL <span>WORLD</span></div>
+    <p class="f-desc">Гриферский проект с честной игрой и нейросетевым античитом. IP: hendelworld.falixsrv.me</p>
+    <div style="margin-top:14px;font-size:12px;color:#64708a;line-height:1.6">
+      Выдача товаров осуществляется автоматически в игре в течение 1–5 минут после оплаты. По всем вопросам и возвратам обращайтесь в техподдержку.
+    </div>
+  </div>
+  <div class="f-col">
+    <h4>Навигация</h4>
+    <a href="#shop">Магазин</a>
+    <a href="#about">О сервере</a>
+    <a href="#rules">Правила</a>
+  </div>
+  <div class="f-col">
+    <h4>Поддержка</h4>
+    <a href="https://t.me/Mankirpro" target="_blank" rel="noopener">Telegram: @Mankirpro</a>
+    <a href="mailto:support@hendel-world.github.io">Email поддержки</a>
+    <a href="#rules">Правила сервера</a>
+  </div>
+  <div class="f-col">
+    <h4>Документы</h4>
+    <a href="#" onclick="openLegal('offer');return false;">Договор оферты</a>
+    <a href="#" onclick="openLegal('privacy');return false;">Конфиденциальность</a>
+    <a href="#" onclick="openLegal('refund');return false;">Правила возврата</a>
+  </div>
 </div>
-<div class="f-bottom"><div class="w">© 2026 HENDEL WORLD</div></div>
+<div class="f-bottom">
+  <div class="w" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center">
+    <div>© 2026 HENDEL WORLD. Все права защищены. Сервер не связан с Mojang AB.</div>
+    <div style="font-size:11px;color:#4a5568">Оплата через AnyPay (СБП, Карты РФ, ЮMoney, Криптовалюта)</div>
+  </div>
+</div>
 </footer>
+
+<!-- LEGAL MODAL -->
+<div class="modal-bg" id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)">
+  <div class="modal" style="max-width:640px;max-height:85vh;overflow-y:auto;text-align:left;line-height:1.7;font-size:13px;color:#a0aec0">
+    <button class="modal-x" onclick="closeLegal()" style="float:right">×</button>
+    <h3 id="legalTitle" style="color:#fff;margin-bottom:16px;font-size:20px">Документ</h3>
+    <div id="legalBody"></div>
+    <div style="margin-top:24px;text-align:right">
+      <button class="btn-main btn-gold" onclick="closeLegal()" style="padding:8px 20px;font-size:13px">Понятно</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div class="modal-bg" id="mbg">
@@ -652,6 +691,34 @@ const anypayUrl = `https://anypay.io/merchant?project_id=18631&pay_id=${payId}&a
 setTimeout(()=>{
   window.location.href = anypayUrl;
 }, 600);
+}
+
+// Legal modals for AnyPay moderation
+const LEGAL_TEXTS = {
+  offer: {
+    title: 'Договор публичной оферты',
+    html: '<p><b>1. Общие положения</b><br>Настоящий документ является официальным предложением (публичной офертой) игрового проекта HENDEL WORLD по предоставлению доступа к дополнительным игровым привилегиям и предметам на сервере hendelworld.falixsrv.me.</p><br><p><b>2. Предмет договора</b><br>Исполнитель предоставляет Пользователю право использования расширенного функционала игрового сервера (привилегии, кейсы, игровая валюта) в соответствии с тарифами, указанными на сайте.</p><br><p><b>3. Порядок оплаты и выдачи</b><br>Оплата производится в безналичном порядке через платежную систему AnyPay. Игровой товар доставляется автоматически на указанный никнейм в течение 1–5 минут с момента подтверждения транзакции.</p><br><p><b>4. Контакты и реквизиты</b><br>По всем вопросам: Telegram <a href="https://t.me/Mankirpro" target="_blank" style="color:#c9a84c">@Mankirpro</a></p>'
+  },
+  privacy: {
+    title: 'Политика конфиденциальности',
+    html: '<p><b>1. Сбор данных</b><br>Мы собираем только минимально необходимые данные для выдачи товара: игровой никнейм и данные об успешном платеже, передаваемые платёжным шлюзом.</p><br><p><b>2. Безопасность</b><br>Мы не храним данные банковских карт или пароли пользователей. Все транзакции защищены SSL-шифрованием на стороне платёжного агрегатора AnyPay.</p>'
+  },
+  refund: {
+    title: 'Правила возврата средств',
+    html: '<p><b>1. Автоматическая доставка</b><br>Все цифровые товары и привилегии доставляются на сервер автоматически. Если товар не был выдан в течение 10 минут из-за технического сбоя, обратитесь в поддержку.</p><br><p><b>2. Порядок возврата</b><br>Для оформления заявки на возврат или ручную выдачу свяжитесь с нами в Telegram: <a href="https://t.me/Mankirpro" target="_blank" style="color:#c9a84c">@Mankirpro</a>, указав никнейм и номер платежа. Заявки рассматриваются в течение 24 часов.</p>'
+  }
+};
+
+function openLegal(type) {
+  const doc = LEGAL_TEXTS[type] || LEGAL_TEXTS.offer;
+  document.getElementById('legalTitle').textContent = doc.title;
+  document.getElementById('legalBody').innerHTML = doc.html;
+  const m = document.getElementById('legalModal');
+  m.style.display = 'flex';
+}
+
+function closeLegal() {
+  document.getElementById('legalModal').style.display = 'none';
 }
 
 // Toast
