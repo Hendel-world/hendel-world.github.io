@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 let botStatus = 'Инициализация...';
 
 app.get('/', (req, res) => {
-    res.send(`<h1>Hendel AFK Bot 24/7</h1><p>Статус: <b>${botStatus}</b></p><p>Сервер: hendelworld.falixsrv.me</p>`);
+    res.send(`<h1>Hendel AFK Bot 24/7</h1><p>Статус: <b>${botStatus}</b></p><p>Сервер: hendelworld.falixsrv.me:49662</p>`);
 });
 
 app.listen(PORT, () => {
@@ -47,23 +47,43 @@ function createBot() {
         console.log('[Bot] Успешно зашёл в мир!');
         botStatus = 'В игре (Сервер активен 24/7)';
 
-        // Регистрация и логин в плагине HendelCore
-        setTimeout(() => {
-            bot.chat(`/register ${MC_PASSWORD} ${MC_PASSWORD}`);
-            setTimeout(() => {
-                bot.chat(`/login ${MC_PASSWORD}`);
-            }, 1500);
-        }, 2000);
-
-        // Анти-АФК: каждые 30 секунд двигаем головой и взмахиваем рукой
+        // Анти-АФК: каждые 25 секунд двигаем головой и взмахиваем рукой
         startAntiAfk();
     });
 
-    bot.on('chat', (username, message) => {
-        if (username === bot.username) return;
-        // Если просят логин
-        if (message.toLowerCase().includes('/login') || message.toLowerCase().includes('авториз')) {
-            bot.chat(`/login ${MC_PASSWORD}`);
+    // Обработка сообщений (Капча и Авторизация)
+    bot.on('message', (jsonMsg) => {
+        const text = jsonMsg.toString();
+        console.log('[Server Msg]:', text);
+
+        // 1. Решение математической капчи HendelCore: "X + Y" или "X - Y"
+        const mathMatch = text.match(/(\d{1,2})\s*([\+\-])\s*(\d{1,2})/);
+        if (mathMatch) {
+            const num1 = parseInt(mathMatch[1], 10);
+            const op = mathMatch[2];
+            const num2 = parseInt(mathMatch[3], 10);
+            const answer = op === '+' ? (num1 + num2) : (num1 - num2);
+            console.log(`[Bot] Решаю капчу: ${num1} ${op} ${num2} = ${answer}`);
+            setTimeout(() => {
+                bot.chat(answer.toString());
+            }, 800);
+            return;
+        }
+
+        // 2. Регистрация
+        if (text.includes('/reg') || text.includes('Зарегистрируйтесь') || text.includes('регистрац')) {
+            console.log('[Bot] Отправляю /register...');
+            setTimeout(() => {
+                bot.chat(`/register ${MC_PASSWORD} ${MC_PASSWORD}`);
+            }, 1000);
+        }
+
+        // 3. Авторизация
+        if (text.includes('/login') || text.includes('Авторизуйтесь') || text.includes('авториз')) {
+            console.log('[Bot] Отправляю /login...');
+            setTimeout(() => {
+                bot.chat(`/login ${MC_PASSWORD}`);
+            }, 1000);
         }
     });
 
@@ -95,14 +115,11 @@ function startAntiAfk() {
             const pitch = (Math.random() * Math.PI / 2) - (Math.PI / 4);
             bot.look(yaw, pitch, true);
             bot.swingArm('right');
-            // Редкий прыжок
-            if (Math.random() < 0.3) {
+            if (Math.random() < 0.25) {
                 bot.setControlState('jump', true);
-                setTimeout(() => bot.setControlState('jump', false), 400);
+                setTimeout(() => bot.setControlState('jump', false), 350);
             }
-        } catch (e) {
-            // игнорируем мелкие ошибки
-        }
+        } catch (e) {}
     }, 25000);
 }
 
