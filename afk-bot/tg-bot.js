@@ -206,4 +206,10 @@ async function startBotPolling() {
     }
 }
 
-module.exports = { startBotPolling };
+async function notifyAdminPayment(text) {
+    if (adminChatId) {
+        await sendMessage(adminChatId, text);
+    }
+}
+
+module.exports = { startBotPolling, notifyAdminPayment };
