@@ -16,7 +16,7 @@ app.listen(PORT, () => {
 
 // 2. Настройки подключения бота к Minecraft
 const MC_HOST = process.env.MC_HOST || 'hendelworld.falixsrv.me';
-const MC_PORT = process.env.MC_PORT ? parseInt(process.env.MC_PORT, 10) : undefined;
+const MC_PORT = parseInt(process.env.MC_PORT || '49662', 10);
 const MC_USERNAME = process.env.MC_USERNAME || 'HendelBot_24_7';
 const MC_PASSWORD = process.env.MC_PASSWORD || 'HendelAFK2026!';
 
@@ -24,17 +24,17 @@ let bot = null;
 let reconnectTimer = null;
 
 function createBot() {
-    console.log(`[Bot] Подключение к ${MC_HOST}...`);
-    botStatus = `Подключается к ${MC_HOST}...`;
+    console.log(`[Bot] Подключение к ${MC_HOST}:${MC_PORT}...`);
+    botStatus = `Подключается к ${MC_HOST}:${MC_PORT}...`;
 
     try {
         const botOptions = {
             host: MC_HOST,
+            port: MC_PORT,
             username: MC_USERNAME,
             version: '1.21.4',
             hideErrors: false
         };
-        if (MC_PORT) botOptions.port = MC_PORT;
         
         bot = mineflayer.createBot(botOptions);
     } catch (e) {
