@@ -197,32 +197,47 @@ function createBot() {
 let antiAfkInterval = null;
 function startAntiAfk() {
     if (antiAfkInterval) clearInterval(antiAfkInterval);
+    
+    // Активное живое движение каждые 2.5 секунды
     antiAfkInterval = setInterval(() => {
         if (!bot || !bot.entity) return;
         try {
-            const yaw = (Math.random() * Math.PI) - (Math.PI / 2);
-            const pitch = (Math.random() * Math.PI / 2) - (Math.PI / 4);
-            bot.look(yaw, pitch, true);
-            bot.swingArm('right');
+            // 1. Если рядом есть игрок (в радиусе 15 блоков) — поворачиваться к нему!
+            const target = bot.nearestEntity(e => e.type === 'player' && e.username !== bot.username);
+            if (target && target.position) {
+                bot.lookAt(target.position.offset(0, 1.6, 0), true);
+                
+                // Приседание (приветствие шифтом как реальный игрок)
+                if (Math.random() < 0.45) {
+                    bot.setControlState('sneak', true);
+                    setTimeout(() => { if (bot) bot.setControlState('sneak', false); }, 400);
+                }
+            } else {
+                // Если рядом никого нет — осматриваться вокруг
+                const yaw = (Math.random() * Math.PI * 2) - Math.PI;
+                const pitch = (Math.random() * 0.6) - 0.3;
+                bot.look(yaw, pitch, true);
+            }
 
-            // Шаг вперед и назад чтобы сбрасывать vanilla/paper AFK-таймер
-            bot.setControlState('forward', true);
+            // 2. Реальные шаги (случайное направление: вперед, назад, вбок)
+            const moves = ['forward', 'back', 'left', 'right'];
+            const move = moves[Math.floor(Math.random() * moves.length)];
+            bot.setControlState(move, true);
             setTimeout(() => {
                 if (!bot) return;
-                bot.setControlState('forward', false);
-                bot.setControlState('back', true);
-                setTimeout(() => {
-                    if (!bot) return;
-                    bot.setControlState('back', false);
-                }, 300);
-            }, 300);
+                bot.setControlState(move, false);
+            }, 600 + Math.floor(Math.random() * 600));
 
-            if (Math.random() < 0.25) {
+            // 3. Прыжки и взмахи рукой
+            if (Math.random() < 0.35) {
                 bot.setControlState('jump', true);
-                setTimeout(() => bot.setControlState('jump', false), 350);
+                setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 350);
+            }
+            if (Math.random() < 0.5) {
+                bot.swingArm('right');
             }
         } catch (e) {}
-    }, 20000);
+    }, 2500);
 }
 
 function scheduleReconnect() {
