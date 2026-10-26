@@ -140,7 +140,15 @@ function createBot() {
         console.log('[Bot] Успешно зашёл в мир!');
         botStatus = 'В игре (Сервер активен 24/7)';
 
-        // Анти-АФК
+        // Авто-авторизация на случай если не было сообщений
+        setTimeout(() => {
+            bot.chat(`/reg ${MC_PASSWORD}`);
+            setTimeout(() => {
+                bot.chat(`/login ${MC_PASSWORD}`);
+            }, 1200);
+        }, 1500);
+
+        // Анти-АФК с активными движениями
         startAntiAfk();
     });
 
@@ -157,22 +165,34 @@ function createBot() {
             console.log(`[Bot] Решаю капчу: ${num1} ${op} ${num2} = ${answer}`);
             setTimeout(() => {
                 bot.chat(answer.toString());
+                setTimeout(() => {
+                    bot.chat(`/reg ${MC_PASSWORD}`);
+                    setTimeout(() => bot.chat(`/login ${MC_PASSWORD}`), 1000);
+                }, 1000);
             }, 800);
             return;
         }
 
         // Регистрация
-        if (text.includes('/reg') || text.includes('Зарегистрируйтесь') || text.includes('регистрац')) {
+        if (text.includes('/reg') || text.includes('Зарегистрируйтесь') || text.includes('регистрац') || text.includes('Придумай пароль')) {
             setTimeout(() => {
-                bot.chat(`/register ${MC_PASSWORD} ${MC_PASSWORD}`);
+                bot.chat(`/reg ${MC_PASSWORD}`);
             }, 1000);
         }
 
         // Авторизация
-        if (text.includes('/login') || text.includes('Авторизуйтесь') || text.includes('авториз')) {
+        if (text.includes('/login') || text.includes('Авторизуйтесь') || text.includes('авториз') || text.includes('Введи пароль')) {
             setTimeout(() => {
                 bot.chat(`/login ${MC_PASSWORD}`);
             }, 1000);
+        }
+
+        // Реакция на чат для проверки
+        if (text.toLowerCase().includes('!бот') || text.toLowerCase().includes('!bot') || text.toLowerCase().includes('прыгни')) {
+            bot.chat('Привет! Я активен 24/7 :)');
+            bot.setControlState('jump', true);
+            bot.swingArm('right');
+            setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 1200);
         }
     });
 
