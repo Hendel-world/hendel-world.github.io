@@ -670,12 +670,56 @@ let avt;function uav(v){clearTimeout(avt);avt=setTimeout(()=>{const n=v.trim();d
 addEventListener('click',e=>{if(e.target.id==='mbg')closeM()});addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
 // Pay card selection
 document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.pay-o').forEach(o=>{o.addEventListener('click',()=>{document.querySelectorAll('.pay-o').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');const r=o.querySelector('input');if(r)r.checked=true})})});
-// MD5 helper for AnyPay SCI signature using SparkMD5 or native
-function calcMD5(str) {
-  if (typeof SparkMD5 !== 'undefined') {
-    return SparkMD5.hash(str);
-  }
-  return '';
+// RFC 1321 MD5 calculation (100% pure JS, zero dependencies, immune to adblockers)
+function calcMD5(string) {
+    function r(v, s) { return (v << s) | (v >>> (32 - s)); }
+    function u(x, y) {
+        var lX8 = (x & 0x80000000), lY8 = (y & 0x80000000), lX4 = (x & 0x40000000), lY4 = (y & 0x40000000);
+        var res = (x & 0x3FFFFFFF) + (y & 0x3FFFFFFF);
+        if (lX4 & lY4) return (res ^ 0x80000000 ^ lX8 ^ lY8);
+        if (lX4 | lY4) {
+            if (res & 0x40000000) return (res ^ 0xC0000000 ^ lX8 ^ lY8);
+            else return (res ^ 0x40000000 ^ lX8 ^ lY8);
+        } else return (res ^ lX8 ^ lY8);
+    }
+    function F(x, y, z) { return (x & y) | ((~x) & z); }
+    function G(x, y, z) { return (x & z) | (y & (~z)); }
+    function H(x, y, z) { return (x ^ y ^ z); }
+    function I(x, y, z) { return (y ^ (x | (~z))); }
+    function FF(a, b, c, d, x, s, ac) { a = u(a, u(u(F(b, c, d), x), ac)); return u(r(a, s), b); }
+    function GG(a, b, c, d, x, s, ac) { a = u(a, u(u(G(b, c, d), x), ac)); return u(r(a, s), b); }
+    function HH(a, b, c, d, x, s, ac) { a = u(a, u(u(H(b, c, d), x), ac)); return u(r(a, s), b); }
+    function II(a, b, c, d, x, s, ac) { a = u(a, u(u(I(b, c, d), x), ac)); return u(r(a, s), b); }
+    var n = string.length, w = [], i;
+    for (i = 0; i < n; i++) w[i >> 2] = (w[i >> 2] || 0) | (string.charCodeAt(i) << ((i % 4) * 8));
+    w[n >> 2] = (w[n >> 2] || 0) | (0x80 << ((n % 4) * 8));
+    var len = (((n + 8) >> 6) + 1) * 16;
+    w[len - 2] = n * 8; w[len - 1] = 0;
+    var a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
+    for (i = 0; i < len; i += 16) {
+        var AA = a, BB = b, CC = c, DD = d;
+        var x0 = w[i]||0, x1 = w[i+1]||0, x2 = w[i+2]||0, x3 = w[i+3]||0, x4 = w[i+4]||0, x5 = w[i+5]||0, x6 = w[i+6]||0, x7 = w[i+7]||0;
+        var x8 = w[i+8]||0, x9 = w[i+9]||0, x10 = w[i+10]||0, x11 = w[i+11]||0, x12 = w[i+12]||0, x13 = w[i+13]||0, x14 = w[i+14]||0, x15 = w[i+15]||0;
+        a = FF(a,b,c,d,x0,7,0xd76aa478); d = FF(d,a,b,c,x1,12,0xe8c7b756); c = FF(c,d,a,b,x2,17,0x242070db); b = FF(b,c,d,a,x3,22,0xc1bdceee);
+        a = FF(a,b,c,d,x4,7,0xf57c0faf); d = FF(d,a,b,c,x5,12,0x4787c62a); c = FF(c,d,a,b,x6,17,0xa8304613); b = FF(b,c,d,a,x7,22,0xfd469501);
+        a = FF(a,b,c,d,x8,7,0x698098d8); d = FF(d,a,b,c,x9,12,0x8b44f7af); c = FF(c,d,a,b,x10,17,0xffff5bb1); b = FF(b,c,d,a,x11,22,0x895cd7be);
+        a = FF(a,b,c,d,x12,7,0x6b901122); d = FF(d,a,b,c,x13,12,0xfd987193); c = FF(c,d,a,b,x14,17,0xa679438e); b = FF(b,c,d,a,x15,22,0x49b40821);
+        a = GG(a,b,c,d,x1,5,0xf61e2562); d = GG(d,a,b,c,x6,9,0xc040b340); c = GG(c,d,a,b,x11,14,0x265e5a51); b = GG(b,c,d,a,x0,20,0xe9b6c7aa);
+        a = GG(a,b,c,d,x5,5,0xd62f105d); d = GG(d,a,b,c,x10,9,0x02441453); c = GG(c,d,a,b,x15,14,0xd8a1e681); b = GG(b,c,d,a,x4,20,0xe7d3fbc8);
+        a = GG(a,b,c,d,x9,5,0x21e1cde6); d = GG(d,a,b,c,x14,9,0xc33707d6); c = GG(c,d,a,b,x3,14,0xf4d50d87); b = GG(b,c,d,a,x8,20,0x455a14ed);
+        a = GG(a,b,c,d,x13,5,0xa9e3e905); d = GG(d,a,b,c,x2,9,0xfcefa3f8); c = GG(c,d,a,b,x7,14,0x676f02d9); b = GG(b,c,d,a,x12,20,0x8d2a4c8a);
+        a = HH(a,b,c,d,x5,4,0xfffa3942); d = HH(d,a,b,c,x8,11,0x8771f681); c = HH(c,d,a,b,x11,16,0x6d9d6122); b = HH(b,c,d,a,x14,23,0xfde5380c);
+        a = HH(a,b,c,d,x1,4,0xa4beea44); d = HH(d,a,b,c,x4,11,0x4bdecfa9); c = HH(c,d,a,b,x7,16,0xf6bb4b60); b = HH(b,c,d,a,x10,23,0xbebfbc70);
+        a = HH(a,b,c,d,x13,4,0x289b7ec6); d = HH(d,a,b,c,x0,11,0xeaa127fa); c = HH(c,d,a,b,x3,16,0xd4ef3085); b = HH(b,c,d,a,x6,23,0x04881d05);
+        a = HH(a,b,c,d,x9,4,0xd9d4d039); d = HH(d,a,b,c,x12,11,0xe6db99e5); c = HH(c,d,a,b,x15,16,0x1fa27cf8); b = HH(b,c,d,a,x2,23,0xc4ac5665);
+        a = II(a,b,c,d,x0,6,0xf4292244); d = II(d,a,b,c,x7,10,0x432aff97); c = II(c,d,a,b,x14,15,0xab9423a7); b = II(b,c,d,a,x5,21,0xfc93a039);
+        a = II(a,b,c,d,x12,6,0x655b59c3); d = II(d,a,b,c,x3,10,0x8f0ccc92); c = II(c,d,a,b,x10,15,0xffeff47d); b = II(b,c,d,a,x1,21,0x85845dd1);
+        a = II(a,b,c,d,x8,6,0x6fa87e4f); d = II(d,a,b,c,x15,10,0xfe2ce6e0); c = II(c,d,a,b,x6,15,0xa3014314); b = II(b,c,d,a,x13,21,0x4e0811a1);
+        a = II(a,b,c,d,x4,6,0xf7537e82); d = II(d,a,b,c,x11,10,0xbd3af235); c = II(c,d,a,b,x2,15,0x2ad7d2bb); b = II(b,c,d,a,x9,21,0xeb86d391);
+        a = u(a, AA); b = u(b, BB); c = u(c, CC); d = u(d, DD);
+    }
+    function hex(v) { var s = ''; for (var j = 0; j < 4; j++) s += ('0' + ((v >>> (j * 8)) & 255).toString(16)).slice(-2); return s; }
+    return hex(a) + hex(b) + hex(c) + hex(d);
 }
 
 function pay(){click();const nick=document.getElementById('mnick').value.trim();
