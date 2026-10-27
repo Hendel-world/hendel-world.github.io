@@ -748,8 +748,8 @@ else if(payMethod === 'crypto') anypayMethod = 'crypto';
 const signStr = `${curr}:${amount}:${secretKey}:${merchantId}:${payId}`;
 const sign = calcMD5(signStr);
 
-// Прямой защищённый переход на кассу AnyPay
-const anypayUrl = `https://anypay.io/merchant?merchant_id=${merchantId}&pay_id=${payId}&amount=${amount}&currency=${curr}&desc=${encodeURIComponent(desc)}&sign=${sign}&method=${anypayMethod}`;
+// Прямой защищённый переход на кассу AnyPay (со всеми методами оплаты)
+const anypayUrl = `https://anypay.io/merchant?merchant_id=${merchantId}&pay_id=${payId}&amount=${amount}&currency=${curr}&desc=${encodeURIComponent(desc)}&sign=${sign}`;
 
 setTimeout(()=>{
   window.location.href = anypayUrl;
