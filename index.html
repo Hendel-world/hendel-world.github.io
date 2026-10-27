@@ -669,6 +669,9 @@ let avt;function uav(v){clearTimeout(avt);avt=setTimeout(()=>{const n=v.trim();d
 addEventListener('click',e=>{if(e.target.id==='mbg')closeM()});addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
 // Pay card selection
 document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.pay-o').forEach(o=>{o.addEventListener('click',()=>{document.querySelectorAll('.pay-o').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');const r=o.querySelector('input');if(r)r.checked=true})})});
+// MD5 helper for AnyPay SCI signature
+function md5(string){function r(v,s){return(v<<s)|(v>>>(32-s))}function a(x,y){var l=(x&0x3FFFFFFF)+(y&0x3FFFFFFF);var h=(x&0x80000000)^(y&0x80000000);return(x&0x40000000)&(y&0x40000000)?l^0x80000000^h:l^h}function f(x,y,z){return(x&y)|((~x)&z)}function g(x,y,z){return(x&z)|(y&(~z))}function h(x,y,z){return x^y^z}function i(x,y,z){return y^(x|(~z))}function ff(a,b,c,d,x,s,ac){a=a+f(b,c,d)+x+ac;return r(a,s)+b}function gg(a,b,c,d,x,s,ac){a=a+g(b,c,d)+x+ac;return r(a,s)+b}function hh(a,b,c,d,x,s,ac){a=a+h(b,c,d)+x+ac;return r(a,s)+b}function ii(a,b,c,d,x,s,ac){a=a+i(b,c,d)+x+ac;return r(a,s)+b}string=unescape(encodeURIComponent(string));var n=string.length,w=[],j;for(j=0;j<n;j++)w[j>>2]|=(string.charCodeAt(j)&255)<<((j%4)*8);w[n>>2]|=0x80<<((n%4)*8);w[(((n+8)>>6)+1)*16-2]=n*8;var A=0x67452301,B=0xEFCDAB89,C=0x98BADCFE,D=0x10325476;for(j=0;j<w.length;j+=16){var AA=A,BB=B,CC=C,DD=D;A=ff(A,B,C,D,w[j+0],7,-680876936);D=ff(D,A,B,C,w[j+1],12,-389564586);C=ff(C,D,A,B,w[j+2],17,606105819);B=ff(B,C,D,A,w[j+3],22,-1044525330);A=ff(A,B,C,D,w[j+4],7,-176418897);D=ff(D,A,B,C,w[j+5],12,1200080426);C=ff(C,D,A,B,w[j+6],17,-1473231341);B=ff(B,C,D,A,w[j+7],22,-45705983);A=ff(A,B,C,D,w[j+8],7,1770035416);D=ff(D,A,B,C,w[j+9],12,-1958414417);C=ff(C,D,A,B,w[j+10],17,-42063);B=ff(B,C,D,A,w[j+11],22,-1990404162);A=ff(A,B,C,D,w[j+12],7,1804603682);D=ff(D,A,B,C,w[j+13],12,-40341101);C=ff(C,D,A,B,w[j+14],17,-1502002290);B=ff(B,C,D,A,w[j+15],22,1236535329);A=gg(A,B,C,D,w[j+1],5,-165796510);D=gg(D,A,B,C,w[j+6],9,-1069501632);C=gg(C,D,A,B,w[j+11],14,643717713);B=gg(B,C,D,A,w[j+0],20,-373897302);A=gg(A,B,C,D,w[j+5],5,-701558691);D=gg(D,A,B,C,w[j+10],9,38016083);C=gg(C,D,A,B,w[j+15],14,-660478335);B=gg(B,C,D,A,w[j+4],20,-405537848);A=gg(A,B,C,D,w[j+9],5,568446438);D=gg(D,A,B,C,w[j+14],9,-1019803690);C=gg(C,D,A,B,w[j+3],14,-187363961);B=gg(B,C,D,A,w[j+8],20,1163531501);A=gg(A,B,C,D,w[j+13],5,-1444681467);D=gg(D,A,B,C,w[j+2],9,-51403784);C=gg(C,D,A,B,w[j+7],14,1735328473);B=gg(B,C,D,A,w[j+12],20,-1926607734);A=hh(A,B,C,D,w[j+5],4,-378558);D=hh(D,A,B,C,w[j+8],11,-2022574463);C=hh(C,D,A,B,w[j+11],16,1839030562);B=hh(B,C,D,A,w[j+14],23,-35309556);A=hh(A,B,C,D,w[j+1],4,-1530992060);D=hh(D,A,B,C,w[j+4],11,1272893353);C=hh(C,D,A,B,w[j+7],16,-155497632);B=hh(B,C,D,A,w[j+10],23,-1094730640);A=hh(A,B,C,D,w[j+13],4,681279174);D=hh(D,A,B,C,w[j+0],11,-358537222);C=hh(C,D,A,B,w[j+3],16,-722521979);B=hh(B,C,D,A,w[j+6],23,76029189);A=hh(A,B,C,D,w[j+9],4,-640364487);D=hh(D,A,B,C,w[j+12],11,-421815835);C=hh(C,D,A,B,w[j+15],16,530742520);B=hh(B,C,D,A,w[j+2],23,-995338651);A=ii(A,B,C,D,w[j+0],6,-198630844);D=ii(D,A,B,C,w[j+7],10,1126891415);C=ii(C,D,A,B,w[j+14],15,-1416354905);B=ii(B,C,D,A,w[j+5],21,-57434055);A=ii(A,B,C,D,w[j+12],6,1700485571);D=ii(D,A,B,C,w[j+3],10,-1894986606);C=ii(C,D,A,B,w[j+10],15,-1051523);B=ii(B,C,D,A,w[j+1],21,-2054922799);A=ii(A,B,C,D,w[j+8],6,1873313359);D=ii(D,A,B,C,w[j+15],10,-30611744);C=ii(C,D,A,B,w[j+6],15,-1560198380);B=ii(B,C,D,A,w[j+13],21,1309151649);A=ii(A,B,C,D,w[j+4],6,-145523070);D=ii(D,A,B,C,w[j+11],10,-1120210379);C=ii(C,D,A,B,w[j+2],15,718787259);B=ii(B,C,D,A,w[j+9],21,-343485551);A=(A+AA)&0xFFFFFFFF;B=(B+BB)&0xFFFFFFFF;C=(C+CC)&0xFFFFFFFF;D=(D+DD)&0xFFFFFFFF;}function hx(v){var s='';for(var k=0;k<4;k++)s+=('0'+((v>>>(k*8))&255).toString(16)).slice(-2);return s}return hx(A)+hx(B)+hx(C)+hx(D)}
+
 function pay(){click();const nick=document.getElementById('mnick').value.trim();
 if(!nick||nick.length<3||nick.length>16||!/^[A-Za-z0-9_]+$/.test(nick)){toast('Укажи ник (3-16, латиница)');return}
 const gw=document.getElementById('gws').value;
@@ -677,19 +680,26 @@ if(gw==='demo'){ok();closeM();toast('ДЕМО: '+S.prod.n+' выдан '+nick);r
 
 toast('Перенаправление в платёжную систему...');
 
-// Генерация уникального ID платежа
-const payId = 'HW_' + Date.now();
-const desc = encodeURIComponent(`${S.prod.n} для ${nick} (${S.prod.id})`);
+// Числовой уникальный ID заказа (Unix timestamp)
+const payId = Math.floor(Date.now() / 1000);
 const amount = S.prod.p;
+const curr = 'RUB';
+const merchantId = '18631';
+const secretKey = 'z6BJacQ0qBphXPd7vgKKmbmUgGcDl8AguxybVHX';
+const desc = `${S.prod.n} для ${nick} (${S.prod.id})`;
 
-// Метод оплаты для AnyPay (sbp, card, ym, crypto)
+// Метод оплаты для AnyPay
 let anypayMethod = 'sbp';
 if(payMethod === 'card') anypayMethod = 'card';
 else if(payMethod === 'yoo') anypayMethod = 'ym';
 else if(payMethod === 'crypto') anypayMethod = 'crypto';
 
-// Прямой переход на защищённую кассу AnyPay
-const anypayUrl = `https://anypay.io/merchant?project_id=18631&pay_id=${payId}&amount=${amount}&currency=RUB&desc=${desc}&method=${anypayMethod}&email=`;
+// Формула AnyPay SCI: MD5(currency:amount:secret_key:merchant_id:pay_id)
+const signStr = `${curr}:${amount}:${secretKey}:${merchantId}:${payId}`;
+const sign = md5(signStr);
+
+// Прямой защищённый переход на кассу AnyPay
+const anypayUrl = `https://anypay.io/merchant?merchant_id=${merchantId}&pay_id=${payId}&amount=${amount}&currency=${curr}&desc=${encodeURIComponent(desc)}&sign=${sign}&method=${anypayMethod}`;
 
 setTimeout(()=>{
   window.location.href = anypayUrl;
